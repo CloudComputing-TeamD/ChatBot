@@ -1,6 +1,5 @@
 import openai
 from open_api_key import OPENAI_API_KEY
-print("[DEBUG] LOADED API KEY:", OPENAI_API_KEY)
 openai.api_key = OPENAI_API_KEY
 
 

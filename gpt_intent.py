@@ -1,7 +1,7 @@
 from openai import OpenAI
 import json
 from open_api_key import OPENAI_API_KEY
-print("[DEBUG] LOADED API KEY:", OPENAI_API_KEY)
+
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 def extract_json_from_gpt(content: str):
