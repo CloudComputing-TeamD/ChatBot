@@ -1,7 +1,7 @@
 from openai import OpenAI
 import json
 from open_api_key import OPENAI_API_KEY
-
+print("[DEBUG] LOADED API KEY:", OPENAI_API_KEY)
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 def extract_json_from_gpt(content: str):
@@ -14,16 +14,18 @@ def classify_intent_gpt(user_input):
     system_prompt = """
 당신은 사용자의 문장을 분석하여 운동 루틴 추천 요청인지 일반 질문인지를 구분하고,  
 운동 루틴 추천 요청일 경우 아래의 JSON 형식으로 정보를 추출합니다.
+단순 운동 추천 요청도 루틴 추천 요청으로 판단합니다.
 
 ### 운동 루틴 추천 요청이면 다음과 같은 JSON을 생성하세요:
 
 {
   "intent": "routine",
-  "preferred_parts": [운동 부위 리스트],    // 가능한 값: 전신, 가슴, 하체, 팔, 복부, 등, 어깨
-  "level": "운동 난이도",                  // 가능한 값: beginner, intermediate, master
   "goal": "운동 목표",                     // 가능한 값: muscle_gain, fat_loss, maintenance
-  "frequency_per_week": 운동 부위 개수,    // 가능한 값: 1부터 7까지. 운동 부위의 개수에 해당하는 값이여야 함.
-  "top_k": 운동 부위별 운동 개수            // 가능한 값: 1부터 5까지. 기본값은 3.
+  "preferred_parts": [운동 부위 리스트],    // 가능한 값: CHEST, BACK, LEGS, SHOULDERS, ARMS, CORE, FULL_BODY
+  "level": "운동 난이도",                  // 가능한 값: beginner, intermediate, advanced
+  "gender": "성별",                        // 가능한 값: male, female, 요청에 대한 적절한 입력값이 없으면 Null.
+  "weight": 체중,                        // 가능한 값: int값, 요청에 대한 적절한 입력값이 없으면 Null.
+  "top_k": 운동 부위별 운동 개수            // 가능한 값: 1부터 5까지. 기본값은 5.
 }
 
 예시:
@@ -31,11 +33,24 @@ def classify_intent_gpt(user_input):
 출력:
 {
   "intent": "routine",
-  "preferred_parts": ["하체", "복부"],
-  "level": "beginner",
   "goal": "fat_loss",
-  "frequency_per_week": 2,
-  "top_k": 3
+  "preferred_parts": ["LEGS", "CORE"],
+  "level": "beginner",
+  "gender": null,
+  "weight" : null,
+  "top_k": 5
+}
+
+예시:
+입력: "여자인데 꾸준히 운동을 하고있습니다. 등 근육을 키우고 싶은데 체중은 50키로 입니다."
+{
+  "intent": "routine",
+  "goal": "muscle_gain",
+  "preferred_parts": ["BACK"],
+  "level": "intermediate",
+  "gender": "female",
+  "weight" : 50,
+  "top_k": 5
 }
 
 ---
@@ -46,8 +61,8 @@ def classify_intent_gpt(user_input):
   "intent": "qa",
   "preferred_parts": null,
   "level": null,
+  "gender": null,
   "goal": null,
-  "frequency_per_week": null,
   "top_k": null
 }
 
@@ -58,8 +73,8 @@ def classify_intent_gpt(user_input):
   "intent": "qa",
   "preferred_parts": null,
   "level": null,
+  "gender": null,
   "goal": null,
-  "frequency_per_week": null,
   "top_k": null
 }
 
@@ -89,8 +104,8 @@ def classify_intent_gpt(user_input):
             "intent": "qa",
             "preferred_parts": None,
             "level": None,
+            "gender": None,
             "goal": None,
-            "frequency_per_week": None,
             "top_k": None
         }
 
